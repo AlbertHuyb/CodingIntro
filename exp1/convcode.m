@@ -13,12 +13,18 @@ param = dec2bin(param);
 param = double(param == '1');
 memory =size(param,2);
 code = [];
-for k = [1:rate]
-    code = [code;conv(data,param(k,:))];
-end
+
 if ~tail
-    code = code(:,1:end-memory+1);
+    for k = [1:rate]
+        code = [code;conv(data,param(k,:))];
+    end
+elseif tail
+    data = [data,repmat(0,1,memory)];
+    for k = [1:rate]
+        code = [code;conv(data,param(k,:))];
+    end        
 end
+code = code(:,1:end-memory+1);
 code = code(:);
 code = mod(code,2)';
 

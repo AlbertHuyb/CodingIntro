@@ -2,12 +2,13 @@ clear all;
 A = 3; %amplify
 sigma_ns = [0:0.1:A];
 random_rate = 0.5;
-sample_length = 10000;
+sample_length = 5;
 voltage_num = 2;
 wrong_rate = zeros(2,length(sigma_ns));
 
 for n = 1:length(sigma_ns)
     sample = random('bino',1,random_rate,1,sample_length);
+    sample = convcode(sample,[15,17,13],1);
     input = A*sample;
     channel_mode = 1;
     out = channel(input,channel_mode,sigma_ns(n));
