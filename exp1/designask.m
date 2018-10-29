@@ -3,8 +3,7 @@ function [ symbol, judgethreshold, pcorrect ] = designask(alphabetabits, SNR)
 %   symbol, pcorrect:  arg max P(correct)
 %   judgethreshold: judgethreshold of amplitude, first element is zero
 %   alphabetbits:   number of bits containing in an alphabet
-%   SNR: average
-%   sigma=1;
+%   SNR: average, sigma=1;
 
 alphabetalen = 2^alphabetabits;
 aver_power = 10^(SNR/10);
@@ -12,35 +11,32 @@ aver_power = 10^(SNR/10);
 %   init_solution
 symbol0 = (1:alphabetalen)-1;
 symbol0 = sqrt(aver_power/(symbol0*symbol0'/length(symbol0))).*symbol0;
+pcbaseline = 1-10^(-6)*pcorr(symbol0);
+
 %   constraint
 lowerbound = zeros(1,alphabetalen);
 upperbound = sqrt(alphabetalen*aver_power./(alphabetalen:-1:1));
 upperbound(1)=0;
 Aeq = [-eye(alphabetalen-1) zeros(alphabetalen-1,1)] + [zeros(alphabetalen-1,1) eye(alphabetalen-1)];
 beq = ones(alphabetalen-1,1)*symbol0(alphabetalen)*0.1;
-
-options = optimoptions('fmincon','Display','iter','Algorithm','sqp','FinDiffType','central');
-
-options = optimoptions('fmincon','Display','iter','Algorithm','sqp','FinDiffType','central');
-
 nonlcon = @(symbol)nonlcyccon(symbol,aver_power*alphabetalen);
-display(pcorr(symbol0));
 
-[symbol, fval, exitflag, ~, ~, ~, hessian] = fmincon(@pcorr,symbol0,[],[],Aeq,beq,lowerbound,upperbound,nonlcon,options);
-%   debug
-display(-10^-6*fval);
-display(exitflag);
-display(hessian);
+%   optimization
+options = optimoptions('fmincon','Display','off','Algorithm','sqp','MaxFunctionEvaluations',ceil(pcorr(symbol0)+4000));
+[symbol, ~, ~, ~, ~, ~, ~] = fmincon(@pcorr,symbol0,[],[],Aeq,beq,lowerbound,upperbound,nonlcon,options);
+[symbol, ~, ~, ~, ~, ~, ~] = fmincon(@pcorr,symbol,[],[],Aeq,beq,lowerbound,upperbound,nonlcon,options);
 
-[symbol, fval, exitflag, ~, ~, ~, hessian] = fmincon(@pcorr,symbol,[],[],Aeq,beq,lowerbound,upperbound,nonlcon,options);
-%   debug
-display(-10^-6*fval);
-display(exitflag);
-display(hessian);
-
-
+%   regularization
+symbol = sqrt(aver_power/(symbol*symbol'/length(symbol))).*symbol;
 [judgethreshold, ~] = threshold(symbol);
-pcorrect = -10^(-6)*pcorr(symbol);
+pcorrect = 1-10^(-6)*pcorr(symbol);
+
+if pcorrect>pcbaseline
+    symbol=symbol0;
+    [judgethreshold, ~] = threshold(symbol);
+    pcorrect = 1-10^(-6)*pcorr(symbol);
+end
+
 end
 
 
@@ -63,11 +59,12 @@ end
 
 function pcorrect = pcorr(symbol)
 [ ~, pcorrecti ] = threshold(symbol);
-pcorrect = -10^6*mean(pcorrecti);
+pcorrect = 10^6*(1-mean(pcorrecti));
 end
 
 
 function [c, ceq] = nonlcyccon(symbol,radiussqure)
-c = symbol*symbol'-radiussqure;
-ceq = [];
+%   S^n non-line-con
+c = [];
+ceq = symbol*symbol' - radiussqure;
 end
