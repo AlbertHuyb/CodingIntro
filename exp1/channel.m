@@ -1,20 +1,16 @@
-function [ output ] = channel( input ,mode, sigma )
-%[ output ] = channel( input ,mode, sigma )
-%   mode:    1 definite phi ; 2 different phi each time
-%   sigma:   power of noise in real and imag part      
-
-switch mode
-    case 1
-        phi = random('unif',0,2*pi);
-        phi = repmat(phi,1,length(input));
-    case 2
-        phi = random('unif',0,2*pi,1,length(input));
-    otherwise
-        error('Ä£Ê½´íÎó')
+function [ output ] = channel( input, phi, sigma )
+%   [ output ] = channel( input ,mode, sigma )
+%   input:  symbols modulated by sender
+%   phi:  0 different phi each time, r.v. \sim U[0,2*pi] ; or input
+%   definite phi \in (0,2*pi] well-defined
+%   sigma:   power of noise in real and imag part
+if phi==0
+    phi = repmat(phi,1,length(input));
+else
+    phi = random('unif',0,2*pi,1,length(input));
 end
 n_r = sigma.*randn(1,length(input));
 n_i = sigma.*randn(1,length(input));
-n = n_r + i*n_i;
-output = input.*exp(i.*phi)+n;
+n = n_r + 1i*n_i;
+output = input.*exp(1i.*phi)+n;
 end
-
