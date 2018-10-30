@@ -1,4 +1,4 @@
-function [ out ] = crc_encoder( data, num )
+function [ out ] = crc_encoder( data, num, block_len )
 %CRC_ENCODER 此处显示有关此函数的摘要
 %   此处显示详细说明
 %[ out ] = crc_encoder( data, num )
@@ -16,8 +16,12 @@ table{5}=[1,1,0,0,0,1,1,0,1];
 table{6}=[1,1,0,0,0,1,1,0,0,1,1];
 table{7}=[1,1,0,0,0,0,0,0,0,1,1,1,1];
 table{8}=[1,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,1];
-[~,res]=deconv([data,repmat(0,1,num)],table{index});
-res = mod(res,2);
-out = [data,res(end-num+1:end)];
+block_num = length(data)/block_len;
+out = zeros(1,block_num*(block_len+num));
+for t=1:block_num
+    [~,res]=deconv([data((t-1)*block_len+1:t*block_len),zeros(1,num)],table{index});
+    res = mod(res,2);
+    out((t-1)*(block_len+num)+1:t*(block_len+num)) =...
+        [data((t-1)*block_len+1:t*block_len),res(end-num+1:end)];
 end
 
