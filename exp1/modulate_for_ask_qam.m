@@ -9,7 +9,7 @@ function [ symbols, symbol, pcorrect ] = modulate_for_ask_qam( keymethod , alpha
 
 len = ceil(length(data)/alphabetabits);
 data = [data zeros(1,len*alphabetabits-length(data))];
-data_inGF = str2int(dec2base(bin2dec(int2str(data)),2^alphabetabits));
+data_inGF = str2num(dec2base(bin2dec(int2str(data)),2^alphabetabits));
 symbols = zeros(1,ceil(length(data)/alphabetabits));
 if(gray_enable)
     data_inGF = bin2gray(data_inGF,'psk',alphabetalen);
@@ -22,12 +22,15 @@ switch keymethod
         symbol = 1:alphabetalen;
         phi = 2*pi/alphabetabits*(symbol);
         symbol = reshape(Amplify.*exp(1i*phi),1,length(phi))+bias_ratio*Amplify;
+        pcorrect = 0; % nonsense
     case '8QAM1'
         symbol = [-(2+3^0.5)^0.5+1j*(2+3^0.5)^0.5,(2+3^0.5)^0.5+1j*(2+3^0.5)^0.5,1j*2^0.5,2^0.5,-(2+3^0.5)^0.5-1j*(2+3^0.5)^0.5,(2+3^0.5)^0.5-1j*(2+3^0.5)^0.5,-2^0.5,-1j*2^0.5]+bias_ratio*(2+3^0.5);
         symbol = sqrt(10^(SNR/10)/(symbol*symbol'/length(symbol))).*symbol;
+        pcorrect = 0; % nonsense
     case '8QAM2'
         symbol = [-1+1j,1j,-1,0,1,-1-1j,-1j,1-1j];
         symbol = sqrt(10^(SNR/10)/(symbol*symbol'/length(symbol))).*symbol;
+        pcorrect = 0; % nonsense
 end
 switch alphabetabits
     case 1

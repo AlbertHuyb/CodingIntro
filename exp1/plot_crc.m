@@ -3,7 +3,7 @@ Iterates = 10;
 random_rate = 0.5;
 crc_len = [5];
 voltage_num = [2,4,8];
-sample_length = [10000,10000,9000];%9000
+sample_length = [1000,1000,900];%9000
 A = 3;
 bias_ratio = 0.2;
 SNR = [-20:2.5:30];
@@ -19,13 +19,16 @@ for k=1:length(voltage_num)
                 
             channel_mode = 1;
             input1 = crc_encoder(sample,crc_len,block_len);
-            %input1 = convcode(input1,[15,17],1);
+            input1 = convcode(input1,[15,17],1);
             %input1 = convcode(input1,[13,15,17],1);
             input = modulate_for_BPSK(input1,voltage_num(k),1,A,bias_ratio);
+            %out = input;
             out = channel(input,channel_mode,sigma_ns(n));
             %硬判决
             result = judge_for_BPSK(out,voltage_num(k),bias_ratio*A);
             result = symbol2sequence_for_PSK(result,voltage_num(k),1);
+            [seq,sym] = viterbi(2,4,[15,17],1,1,result,log2(voltage_num(k)));
+            result = seq(1:end-4);
             %得到硬判决符号序列
             
             %软判决，直接从out出发译码
