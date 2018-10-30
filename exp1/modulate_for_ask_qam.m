@@ -34,6 +34,10 @@ switch keymethod
         symbol = [-1+1j,1j,-1,0,1,-1-1j,-1j,1-1j];
         symbol = sqrt(10^(SNR/10)/(symbol*symbol'/length(symbol))).*symbol;
         pcorrect = 0; % nonsense
+    case '8QAM3'
+        symbol = [-1+1j,1j,1+1j,-1,1,-1-1j,-1j,1-1j]+bias_ratio*(2^0.5);
+        symbol = sqrt(10^(SNR/10)/(symbol*symbol'/length(symbol))).*symbol;
+        pcorrect = 0; % nonsense
 end
 switch alphabetabits
     case 1

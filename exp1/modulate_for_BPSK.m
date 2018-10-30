@@ -1,4 +1,4 @@
-function [ out ] = modulate_for_BPSK( input, symbol_num, gray_enable, amplify ,bias_ratio)
+function [ out ,symbol] = modulate_for_BPSK( input, symbol_num, gray_enable, amplify ,bias_ratio)
 %MODULATE_FOR_BPSK 此处显示有关此函数的摘要
 %   此处显示详细说明
 %[ out ] = modulate_for_BPSK( input, symbol_num, gray_enable, amplify ，bias_ratio)
@@ -17,5 +17,9 @@ if(gray_enable)
 end
 phi = 2*pi/symbol_num*(integer_input);
 out = reshape(amplify.*exp(1i*phi),1,length(phi))+bias_ratio*amplify;
+
+symbol = 0:symbol_num-1;
+phis = 2*pi/symbol_num*(symbol);
+symbol = reshape(amplify.*exp(1i*phis),1,length(phis))+bias_ratio*amplify;
 end
 

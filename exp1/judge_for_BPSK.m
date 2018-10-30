@@ -1,4 +1,4 @@
-function [ symbol_index ] = judge_for_BPSK( input,symbol_num,bias_amount )
+function [ symbol_index,prob ] = judge_for_BPSK( input,symbol_num,bias_amount,symbol )
 %JUDGE_FOR_BPSK 此处显示有关此函数的摘要
 %   此处显示详细说明
 %   [ symbol_index ] = judge_for_BPSK( input,symbol_num,gray_enable)
@@ -21,6 +21,8 @@ for i = 1:symbol_num
     end
     symbol_index(index) = i-1;    
 end 
-
+prob = -abs(repmat(data,symbol_num,1)-repmat((symbol-bias_amount).',1,length(data))).^2;
+%data_inGF = mod(find(prodata_inGF==max(prodata_inGF)),8)';
+%data_inGF(data_inGF==0) = 2^alphabetabits;
 end
 

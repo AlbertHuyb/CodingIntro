@@ -17,9 +17,9 @@ for n = 1:length(sigma_ns)
                 
         channel_mode = 1;
         input = sample;
-        input = modulate_for_BPSK(input,voltage_num,1,A,bias_ratio(k));
+        [input,sites] = modulate_for_BPSK(input,voltage_num,1,A,bias_ratio(k));
         out = channel(input,channel_mode,sigma_ns(n));
-        result = judge_for_BPSK(out,voltage_num,bias_ratio(k)*A);
+        [result,prob] = judge_for_BPSK(out,voltage_num,bias_ratio(k)*A,sites);
         result = symbol2sequence_for_PSK(result,voltage_num,1);
         wrong_rate(1,n) = wrong_rate(1,n)+1-sum(sample == result)/sample_length;
         

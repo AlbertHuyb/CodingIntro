@@ -17,10 +17,10 @@ for n = 1:length(sigma_ns)
                 
         channel_mode = 1;
         input = add_sequence_for_MPSK(sample,voltage_num,len(k));
-        input = modulate_for_PSK(input,voltage_num,1,A);
+        [input,sites] = modulate_for_PSK(input,voltage_num,0,A);
         out = channel(input,channel_mode,sigma_ns(n));
-        result = judge_for_PSK(out,voltage_num,len(k));
-        result = symbol2sequence_for_PSK(result,voltage_num,1);
+        [result,prob] = judge_for_PSK(out,voltage_num,len(k),sites);
+        result = symbol2sequence_for_PSK(result,voltage_num,0);
         wrong_rate(1,n) = wrong_rate(1,n)+1-sum(sample == result)/sample_length;
     end
     wrong_rate(1,n)=wrong_rate(1,n)/Iterates;
