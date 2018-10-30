@@ -24,7 +24,8 @@ switch keymethod
                 prodata_inGF = -abs(repmat(symbols,8,1)-repmat((symbol-bias_ratio).',1,length(symbols))).^2;
                 %data_inGF = mod(find(prodata_inGF==max(prodata_inGF)),8)';
                 %data_inGF(data_inGF==0) = 2^alphabetabits;
-                [~,data_inGF] = max(prodata_inGF)-1;
+                [~,data_inGF] = max(prodata_inGF);
+                data_inGF = data_inGF -1;
             otherwise
                 error('you cant use 8QAM1');
         end
@@ -37,7 +38,8 @@ switch keymethod
                 prodata_inGF = -abs(repmat(symbols,8,1)-repmat(symbol.',1,length(symbols))).^2;
 %                 data_inGF = mod(find(prodata_inGF==max(prodata_inGF)),8)';
 %                 data_inGF(data_inGF==0) = 2^alphabetabits;
-                [~,data_inGF] = max(prodata_inGF)-1;
+                [~,data_inGF] = max(prodata_inGF);
+                data_inGF = data_inGF -1;
             otherwise
                 error('you cant use 8QAM2');
         end

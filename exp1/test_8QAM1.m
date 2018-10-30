@@ -20,10 +20,9 @@ for n = 1:length(SNR)
         channel_mode = 1;
         input = sample;
         [input,sites,~] = modulate_for_ask_qam('8QAM1',log2(voltage_num),input,SNR(n),bias_ratio(k),0);
-        %out = channel(input,channel_mode,sigma_ns);
-        out = input;
+        out = channel(input,channel_mode,sigma_ns);
+%         out = input;
         [result,~] = demodulate_for_ask_qam('8QAM1',log2(voltage_num),out,sites);
-        result = result -1;
         result = symbol2sequence_for_PSK(result,voltage_num,0);
         wrong_rate(1,n) = wrong_rate(1,n)+1-sum(sample == result)/sample_length;
         
