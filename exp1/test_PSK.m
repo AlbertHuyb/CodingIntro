@@ -1,10 +1,10 @@
 clear all;
 A = 3; %amplify
 len = [5,10,15,20]; %10 for 4symbols, 
-sigma_ns = [0.01:0.2:8];
+sigma_ns = [0.41:0.2:8];
 random_rate = 0.5;
-sample_length = 10000;
-voltage_num = 2;
+sample_length = 9999;
+voltage_num = 8;
 wrong_rate = zeros(1,length(sigma_ns));
 Iterates = 10;
 

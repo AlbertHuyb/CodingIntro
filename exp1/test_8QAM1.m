@@ -1,9 +1,10 @@
 clear all;
 bias_ratio = [0.1:0.1:0.5]; %0.2 is best
 sigma_ns = 1;
-SNR=[-20:2.5:30];
+%SNR=[-20:2.5:30];
+SNR = 15;
 random_rate = 0.5;
-sample_length = 9999;
+sample_length = 999;
 voltage_num = 8;
 wrong_rate = zeros(1,length(sigma_ns));
 Iterates = 10;

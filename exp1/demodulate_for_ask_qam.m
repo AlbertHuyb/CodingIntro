@@ -6,7 +6,7 @@ function [ data_inGF, prodata_inGF ] = demodulate_for_ask_qam( keymethod, alphab
 %   threshould:  average power of voltage-noise ratio
 
 data_inGF = zeros(1,length(symbols));
-prodata_inGF = zreos(2^alphabetabits,length(symbols));
+prodata_inGF = zeros(2^alphabetabits,length(symbols));
 switch keymethod
     case 'ASK'
         symbols = abs(symbols);
@@ -22,8 +22,9 @@ switch keymethod
                 bias_ratio = mean(symbol);
                 symbols = symbols.*exp(-1i*phi0)-bias_ratio;
                 prodata_inGF = -abs(repmat(symbols,8,1)-repmat(symbol.',1,length(symbols))).^2;
-                data_inGF = mod(find(prodata_inGF==max(prodata_inGF)),8)';
-                data_inGF(data_inGF==0) = 2^alphabetabits;
+                %data_inGF = mod(find(prodata_inGF==max(prodata_inGF)),8)';
+                %data_inGF(data_inGF==0) = 2^alphabetabits;
+                [~,data_inGF] = max(prodata_inGF);
             otherwise
                 error('you cant use 8QAM1');
         end

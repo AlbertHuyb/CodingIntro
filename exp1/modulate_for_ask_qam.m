@@ -9,7 +9,10 @@ function [ symbols, symbol, pcorrect ] = modulate_for_ask_qam( keymethod , alpha
 
 len = ceil(length(data)/alphabetabits);
 data = [data zeros(1,len*alphabetabits-length(data))];
-data_inGF = str2num(dec2base(bin2dec(int2str(data)),2^alphabetabits));
+input = reshape(data,alphabetabits,length(data)/alphabetabits)';
+input = num2str(input);
+data_inGF = bin2dec(input);
+% data_inGF = str2num(dec2base(bin2dec(int2str(data)),2^alphabetabits));
 symbols = zeros(1,ceil(length(data)/alphabetabits));
 if(gray_enable)
     data_inGF = bin2gray(data_inGF,'psk',alphabetalen);
