@@ -1,4 +1,4 @@
-function [ symbols, threshould, pcorrect ] = modulate( keymethod , alphabetabits, data ,SNR , bias_ratio , gray_enable)
+function [ symbols, threshould, pcorrect ] = modulate_for_ask_qam( keymethod , alphabetabits, data ,SNR , bias_ratio , gray_enable)
 %   [ symbols ] = modulate( keymethod , alphabetbits, data )
 %   keymethod:  ASK for stochastic phi and PSK(bias_ratio=0), BPSK for
 %   definite phi, 8QAM
