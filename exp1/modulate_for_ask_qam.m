@@ -15,7 +15,7 @@ data_inGF = bin2dec(input);
 % data_inGF = str2num(dec2base(bin2dec(int2str(data)),2^alphabetabits));
 symbols = zeros(1,ceil(length(data)/alphabetabits));
 if(gray_enable)
-    data_inGF = bin2gray(data_inGF,'psk',alphabetalen);
+    data_inGF = bin2gray(data_inGF,'psk',2^alphabetabits);
 end
 switch keymethod
     case 'ASK'
