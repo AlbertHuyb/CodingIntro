@@ -30,9 +30,10 @@ options = optimoptions('fmincon','Display','off','Algorithm','sqp','MaxFunctionE
 symbol = sqrt(aver_power/(symbol*symbol'/length(symbol))).*symbol;
 [judgethreshold, ~] = threshold(symbol);
 pcorrect = 1-10^(-6)*pcorr(symbol);
-
-if pcorrect>pcbaseline
-    symbol=symbol0;
+%   baseline
+if pcorrect < pcbaseline
+    DISP(1);
+    symbol = symbol0;
     [judgethreshold, ~] = threshold(symbol);
     pcorrect = 1-10^(-6)*pcorr(symbol);
 end

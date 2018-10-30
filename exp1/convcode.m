@@ -15,12 +15,12 @@ memory =size(param,2);
 code = [];
 
 if ~tail
-    for k = [1:rate]
+    for k = 1:rate
         code = [code;conv(data,param(k,:))];
     end
 elseif tail
-    data = [data,repmat(0,1,memory)];
-    for k = [1:rate]
+    data = [data,zeros(1,memory)];
+    for k = 1:rate
         code = [code;conv(data,param(k,:))];
     end        
 end
