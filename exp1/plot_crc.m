@@ -21,13 +21,14 @@ for k=1:length(voltage_num)
             input1 = crc_encoder(sample,crc_len,block_len);
             input1 = convcode(input1,[15,17],1);
             %input1 = convcode(input1,[13,15,17],1);
-            input = modulate_for_BPSK(input1,voltage_num(k),1,A,bias_ratio);
+            [input,sites] = modulate_for_BPSK(input1,voltage_num(k),1,A,bias_ratio);
             %out = input;
             out = channel(input,channel_mode,sigma_ns(n));
             %硬判决
-            result = judge_for_BPSK(out,voltage_num(k),bias_ratio*A);
+            [result,prob] = judge_for_BPSK(out,voltage_num(k),bias_ratio*A,sites);
             result = symbol2sequence_for_PSK(result,voltage_num(k),1);
-            [seq,sym] = viterbi(2,4,[15,17],1,1,result,log2(voltage_num(k)));
+            data = prob(:);
+            [seq,sym] = viterbi(2,4,[15,17],0,1,data,log2(voltage_num(k)));
             result = seq(1:end-4);
             %得到硬判决符号序列
             
