@@ -19,9 +19,9 @@ switch keymethod
             case 3
                 avg_vec = mean(symbols);
                 phi0 = angle(avg_vec);
-                bias_ratio = mean(symbol);
+                bias_ratio = abs(mean(symbol));
                 symbols = symbols.*exp(-1i*phi0)-bias_ratio;
-                prodata_inGF = -abs(repmat(symbols,8,1)-repmat(symbol.',1,length(symbols))).^2;
+                prodata_inGF = -abs(repmat(symbols,8,1)-repmat((symbol-bias_ratio).',1,length(symbols))).^2;
                 %data_inGF = mod(find(prodata_inGF==max(prodata_inGF)),8)';
                 %data_inGF(data_inGF==0) = 2^alphabetabits;
                 [~,data_inGF] = max(prodata_inGF);
