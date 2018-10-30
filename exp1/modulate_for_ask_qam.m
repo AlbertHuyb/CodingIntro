@@ -1,4 +1,4 @@
-function [ symbols, threshould, pcorrect ] = modulate_for_ask_qam( keymethod , alphabetabits, data ,SNR , bias_ratio , gray_enable)
+function [ symbols, symbol, pcorrect ] = modulate_for_ask_qam( keymethod , alphabetabits, data ,SNR , bias_ratio , gray_enable)
 %   [ symbols ] = modulate( keymethod , alphabetbits, data )
 %   keymethod:  ASK for stochastic phi and PSK(bias_ratio=0), BPSK for
 %   definite phi, 8QAM
@@ -16,7 +16,7 @@ if(gray_enable)
 end
 switch keymethod
     case 'ASK'
-        [ symbol, threshould, pcorrect ] = designask(alphabetabits,SNR);
+        [ symbol, ~, pcorrect ] = designask(alphabetabits,SNR);
     case 'BPSK'
         Amplify=sqrt(2*10^(SNR/10)/(bias_ratio^2+1));
         symbol = 1:alphabetalen;
