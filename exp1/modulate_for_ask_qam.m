@@ -19,7 +19,7 @@ if(gray_enable)
 end
 switch keymethod
     case 'ASK'
-        [ symbol, ~, pcorrect ] = designask(alphabetabits,SNR);
+        [ symbol, pcorrect ] = designask(alphabetabits,SNR);
     case 'BPSK'
         Amplify=sqrt(2*10^(SNR/10)/(bias_ratio^2+1));
         symbol = 1:alphabetalen;
