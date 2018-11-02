@@ -13,7 +13,11 @@ function [seq,path]=viterbi(n,N,poly,judge,ending,input,GF2n)
 %        input:输入的待译码的符号序列，是一个向量
 %        GF2n:为1表示1比特/符号，为2表示2比特/符号，为3表示3比特/符号
 %}
-    L=length(input)/n;
+    if (judge==1)
+        L=length(input)/n;
+    else
+        L=length(input)/(2^GF2n*2);
+    end
     dis=Inf(1,2^N);
     survival=zeros(2^N,L*n);
     estimation=zeros(2^N,L);
@@ -67,7 +71,7 @@ function [seq,path]=viterbi(n,N,poly,judge,ending,input,GF2n)
                 k=viterbi_extend(j,0,N);
                 val=dis(j);
                 code=viterbi_convolution(j,0,n,N,poly);
-                val=val+viterbi_Euclid(n,input(n*(i-1)+1:n*i),code);
+                val=val+viterbi_Euclid(n,input((2^GF2n*2)*(i-1)+1:(2^GF2n*2)*i),code);
                 if (val<new_dis(k))
                     new_dis(k)=val;
                     for t=1:L*n
@@ -82,7 +86,7 @@ function [seq,path]=viterbi(n,N,poly,judge,ending,input,GF2n)
                 k=viterbi_extend(j,1,N);
                 val=dis(j);
                 code=viterbi_convolution(j,1,n,N,poly);
-                val=val+viterbi_Euclid(n,input(n*(i-1)+1:n*i),code);
+                val=val+viterbi_Euclid(n,input((2^GF2n*2)*(i-1)+1:(2^GF2n*2)*i),code);
                 if (val<new_dis(k))
                     new_dis(k)=val;
                     for t=1:L*n
