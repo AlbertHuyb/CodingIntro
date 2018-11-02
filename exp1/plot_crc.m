@@ -20,6 +20,7 @@ for k=1:length(voltage_num)
                 
             channel_mode = 1;
             input1 = crc_encoder(sample,crc_len,block_len);
+            %tmp=input1;
             input1 = convcode(input1,[15,17],1);
             %input1 = convcode(input1,[13,15,17],1);
             [input,sites] = modulate_for_BPSK(input1,voltage_num(k),1,A,bias_ratio);
