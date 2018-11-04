@@ -13,70 +13,168 @@ function [seq,path]=viterbi(n,N,poly,judge,ending,input,GF2n)
 %        input:输入的待译码的符号序列，是一个向量
 %        GF2n:为1表示1比特/符号，为2表示2比特/符号，为3表示3比特/符号
 %}
-    L=length(input)/n;
+    if (judge==1)
+        L=length(input)/(2^GF2n);
+    else
+        L=length(input)/(2^GF2n*2);
+    end
     dis=Inf(1,2^N);
     survival=zeros(2^N,L*n);
     estimation=zeros(2^N,L);
     new_survival=zeros(2^N,L*n);
     new_estimation=zeros(2^N,L);
     dis(1)=0;
-    for i=1:L
-        new_dis=Inf(1,2^N);
-        for j=1:2^N
-            k=viterbi_extend(j,0,N);
-            val=dis(j);
-            if (judge==0)
-                if (val~=Inf)
-                    val=-val;
+    if (judge==1)
+        if (GF2n==1)
+            for i=1:L
+                new_dis=Inf(1,2^N);
+                for j=1:2^N
+                    k=viterbi_extend(j,0,N);
+                    val=dis(j);
+                    code=viterbi_convolution(j,0,n,N,poly);
+                    val=val+viterbi_Hamming(n,input(n*(i-1)+1:n*i),code);
+                    if (val<new_dis(k))
+                        new_dis(k)=val;
+                        for t=1:L*n
+                            new_survival(k,t)=survival(j,t);
+                        end
+                        new_survival(k,n*(i-1)+1:n*i)=code;
+                        for t=1:L
+                            new_estimation(k,t)=estimation(j,t);
+                        end
+                        new_estimation(k,i)=0;
+                    end
+                    k=viterbi_extend(j,1,N);
+                    val=dis(j);
+                    code=viterbi_convolution(j,1,n,N,poly);
+                    val=val+viterbi_Hamming(n,input(n*(i-1)+1:n*i),code);
+                    if (val<new_dis(k))
+                    new_dis(k)=val;
+                        for t=1:L*n
+                        new_survival(k,t)=survival(j,t);
+                        end
+                        new_survival(k,n*(i-1)+1:n*i)=code;
+                        for t=1:L
+                            new_estimation(k,t)=estimation(j,t);
+                        end
+                        new_estimation(k,i)=1;
+                    end
                 end
+                dis=new_dis;
+                survival=new_survival;
+                estimation=new_estimation;
             end
-            code=viterbi_convolution(j,0,n,N,poly);
-            val=val+viterbi_Hamming(n,input(n*(i-1)+1:n*i),code,judge);
-            if (judge==0)
-                if (val~=Inf)
-                    val=-val;
+        elseif (GF2n==2)
+            for i=1:L
+                new_dis=Inf(1,2^N);
+                for j=1:2^N
+                    k=viterbi_extend(j,[0,0],N);
+                    val=dis(j);
+                    code=viterbi_convolution(j,[0,0],n,N,poly);
+                    val=val+viterbi_Hamming(n,input(n*(i-1)+1:n*i),code);
+                    if (val<new_dis(k))
+                        new_dis(k)=val;
+                        for t=1:L*n
+                            new_survival(k,t)=survival(j,t);
+                        end
+                        new_survival(k,n*(i-1)+1:n*i)=code;
+                        for t=1:L
+                            new_estimation(k,t)=estimation(j,t);
+                        end
+                        new_estimation(k,i)=0;
+                    end
+                    k=viterbi_extend(j,[0,1],N);
+                    val=dis(j);
+                    code=viterbi_convolution(j,[0,1],n,N,poly);
+                    val=val+viterbi_Hamming(n,input(n*(i-1)+1:n*i),code);
+                    if (val<new_dis(k))
+                    new_dis(k)=val;
+                        for t=1:L*n
+                        new_survival(k,t)=survival(j,t);
+                        end
+                        new_survival(k,n*(i-1)+1:n*i)=code;
+                        for t=1:L
+                            new_estimation(k,t)=estimation(j,t);
+                        end
+                        new_estimation(k,i)=1;
+                    end
+                    k=viterbi_extend(j,[1,0],N);
+                    val=dis(j);
+                    code=viterbi_convolution(j,[1,0],n,N,poly);
+                    val=val+viterbi_Hamming(n,input(n*(i-1)+1:n*i),code);
+                    if (val<new_dis(k))
+                        new_dis(k)=val;
+                        for t=1:L*n
+                            new_survival(k,t)=survival(j,t);
+                        end
+                        new_survival(k,n*(i-1)+1:n*i)=code;
+                        for t=1:L
+                            new_estimation(k,t)=estimation(j,t);
+                        end
+                        new_estimation(k,i)=0;
+                    end
+                    k=viterbi_extend(j,[1,1],N);
+                    val=dis(j);
+                    code=viterbi_convolution(j,[1,1],n,N,poly);
+                    val=val+viterbi_Hamming(n,input(n*(i-1)+1:n*i),code);
+                    if (val<new_dis(k))
+                        new_dis(k)=val;
+                        for t=1:L*n
+                            new_survival(k,t)=survival(j,t);
+                        end
+                        new_survival(k,n*(i-1)+1:n*i)=code;
+                        for t=1:L
+                            new_estimation(k,t)=estimation(j,t);
+                        end
+                        new_estimation(k,i)=0;
+                    end
                 end
+                dis=new_dis;
+                survival=new_survival;
+                estimation=new_estimation;
             end
-            if (val<new_dis(k))
-                new_dis(k)=val;
-                for t=1:L*n
-                    new_survival(k,t)=survival(j,t);
-                end
-                new_survival(k,n*(i-1)+1:n*i)=code;
-                for t=1:L
-                    new_estimation(k,t)=estimation(j,t);
-                end
-                new_estimation(k,i)=0;
-            end
-            k=viterbi_extend(j,1,N);
-            val=dis(j);
-            if (judge==0)
-                if (val~=Inf)
-                    val=-val;
-                end
-            end
-            code=viterbi_convolution(j,1,n,N,poly);
-            val=val+viterbi_Hamming(n,input(n*(i-1)+1:n*i),code,judge);
-            if (judge==0)
-                if (val~=Inf)
-                    val=-val;
-                end
-            end
-            if (val<new_dis(k))
-                new_dis(k)=val;
-                for t=1:L*n
-                    new_survival(k,t)=survival(j,t);
-                end
-                new_survival(k,n*(i-1)+1:n*i)=code;
-                for t=1:L
-                    new_estimation(k,t)=estimation(j,t);
-                end
-                new_estimation(k,i)=1;
-            end
+        else
         end
-        dis=new_dis;
-        survival=new_survival;
-        estimation=new_estimation;
+    else
+        input=exp(input);
+        for i=1:L
+            new_dis=Inf(1,2^N);
+            for j=1:2^N
+                k=viterbi_extend(j,0,N);
+                val=dis(j);
+                code=viterbi_convolution(j,0,n,N,poly);
+                val=val+viterbi_Euclid(n,input((2^GF2n*2)*(i-1)+1:(2^GF2n*2)*i),code);
+                if (val<new_dis(k))
+                    new_dis(k)=val;
+                    for t=1:L*n
+                        new_survival(k,t)=survival(j,t);
+                    end
+                    new_survival(k,n*(i-1)+1:n*i)=code;
+                    for t=1:L
+                        new_estimation(k,t)=estimation(j,t);
+                    end
+                    new_estimation(k,i)=0;
+                end
+                k=viterbi_extend(j,1,N);
+                val=dis(j);
+                code=viterbi_convolution(j,1,n,N,poly);
+                val=val+viterbi_Euclid(n,input((2^GF2n*2)*(i-1)+1:(2^GF2n*2)*i),code);
+                if (val<new_dis(k))
+                    new_dis(k)=val;
+                    for t=1:L*n
+                        new_survival(k,t)=survival(j,t);
+                    end
+                    new_survival(k,n*(i-1)+1:n*i)=code;
+                    for t=1:L
+                        new_estimation(k,t)=estimation(j,t);
+                    end
+                    new_estimation(k,i)=1;
+                end
+            end
+            dis=new_dis;
+            survival=new_survival;
+            estimation=new_estimation;
+        end
     end
     id=1;
     if (ending==0)

@@ -10,10 +10,9 @@ prodata_inGF = zeros(2^alphabetabits,length(symbols));
 switch keymethod
     case 'ASK'
         symbols = abs(symbols);
-        prodata_inGF= exp(-0.5*repmat(symbol.',1,length(symbols)).^2)*besseli(symbol'*symbols);
-        data_inGF = mod(find(prodata_inGF==max(prodata_inGF)),8)';
-        data_inGF(data_inGF==0) = 2^alphabetabits;
-        prodata_inGF = log(prodata_inGF);
+        prodata_inGF= (-0.5*repmat(symbol.',1,length(symbols)).^2)+log(besseli(0,symbol'*symbols));
+        [~,data_inGF] = max(prodata_inGF);
+        data_inGF = data_inGF-1;
     case '8QAM1'
         switch alphabetabits
             case 3

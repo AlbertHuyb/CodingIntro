@@ -2,19 +2,16 @@ clear all;
 Iterates = 10;
 random_rate = 0.5;
 crc_len = [5];
-% voltage_num = [2,4,8];
-voltage_num = 4;
+voltage_num = [4,8];
 sample_length = [1000,1000,900];%9000
 A = 3;
 bias_ratio = 0.2;
-% SNR = [-20:2.5:30];
-SNR = 5;
+%SNR = [-20:2.5:30];
+SNR=30;
 S = (bias_ratio^2+1)*A^2;
-block_len = 100;
+block_len = 10;
 sigma_ns = sqrt(S/2./10.^(SNR/10));
 wrong_rate = zeros(4,length(sigma_ns));
-
-error_block=[];
 
 for k=1:length(voltage_num)
     for n = 1:length(sigma_ns)
@@ -22,9 +19,9 @@ for k=1:length(voltage_num)
             sample = random('bino',1,random_rate,1,sample_length(k));
                 
             channel_mode = 1;
-            input0 = crc_encoder(sample,crc_len,block_len);
-            input1 = convcode(input0,[15,17],1);
-            input0 = reshape(input0,block_len+crc_len,length(input0)/(block_len+crc_len))';
+            input1 = crc_encoder(sample,crc_len,block_len);
+            %tmp=input1;
+            input1 = convcode(input1,[15,17],1);
             %input1 = convcode(input1,[13,15,17],1);
             [input,sites] = modulate_for_BPSK(input1,voltage_num(k),1,A,bias_ratio);
             %out = input;
@@ -47,24 +44,12 @@ for k=1:length(voltage_num)
                 flag = crc_judge(result(t,:),crc_len);
                 if ~flag
                     wrong_blocks = wrong_blocks + 1;
-                    error_block = [error_block;mod(result(t,1:end-crc_len)-input0(t,1:end-crc_len),2)];
                 end
             end
             wrong_rate(k,n) = wrong_rate(k,n)+wrong_blocks/total_blocks;
         end
         wrong_rate(k,n)=wrong_rate(k,n)/Iterates;
     end
-end
-
-subplot(1,2,1)
-for k=1:5
-    plot(error_block(k,:));
-    hold on
-end
-subplot(1,2,2)
-for k=6:10
-    plot(error_block(k,:));
-    hold on
 end
 
 subplot(1,2,1)
@@ -87,4 +72,3 @@ set(gca,'yscale','log')
 xlabel('SNR/dB')
 ylabel('误块率')
 title('误块率 SNR 对数坐标曲线')
-
