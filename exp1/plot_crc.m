@@ -21,7 +21,9 @@ for k=1:length(voltage_num)
             channel_mode = 1;
             input1 = crc_encoder(sample,crc_len,block_len);
             %tmp=input1;
+            tmp=input1;
             input1 = convcode(input1,[15,17],1);
+            conv_tmp=input1;
             %input1 = convcode(input1,[13,15,17],1);
             [input,sites] = modulate_for_BPSK(input1,voltage_num(k),1,A,bias_ratio);
             %out = input;
@@ -30,8 +32,10 @@ for k=1:length(voltage_num)
             [result,prob] = judge_for_BPSK(out,voltage_num(k),bias_ratio*A,sites);
             result = symbol2sequence_for_PSK(result,voltage_num(k),1);
             data = prob(:);
-            [seq,sym] = viterbi(2,4,[15,17],1,1,result,log2(voltage_num(k)));
+            [seq,sym] = viterbi(2,4,[15,17],0,1,data,log2(voltage_num(k)));
+            %[seq,sym] = viterbi(2,4,[15,17],1,1,input1,log2(voltage_num(k)));
             result = seq(1:end-4);
+            sum(abs(result-tmp))
             %得到硬判决符号序列
             
             %软判决，直接从out出发译码
