@@ -70,12 +70,12 @@ for n = 1:length(sigma_ns)
         end
         [input,sites] = modulate_for_BPSK(input,voltage_num(k),1,A,bias_ratio);
         out = channel(input,channel_mode,sigma_ns(n));
-        [result,~] = judge_for_BPSK(out,voltage_num(k),bias_ratio*A,sites);
-        result = symbol2sequence_for_PSK(result,voltage_num(k),1);
+        [~,prob] = judge_for_BPSK(out,voltage_num(k),bias_ratio*A,sites);
+        data = prob(:);
         if voltage_num(k)==4
-            [seq,sym] = viterbi(2,4,[15,17],0,0,result,1);
+            [seq,sym] = viterbi(2,4,[15,17],0,0,data,1);
         elseif voltage_num(k)==8
-            [seq,sym] = viterbi(3,4,[13,15,17],0,0,result,1);
+            [seq,sym] = viterbi(3,4,[13,15,17],0,0,data,1);
         end
         result = seq;
         wrong_rate(k+4,n) = wrong_rate(k+4,n)+1-sum(sample == result)/sample_length;
@@ -84,17 +84,17 @@ for n = 1:length(sigma_ns)
             input0 = convcode(sample,[13,15,17],0);
             [input,sites] = modulate_for_ask_qam('8QAM1',log2(voltage_num(k)),input0,SNR(n),bias_ratio,1);
             out = channel(input,channel_mode,sigma_ns(n));
-            [result,~] = demodulate_for_ask_qam('8QAM1',log2(voltage_num),out,sites);
-            result = symbol2sequence_for_PSK(result,voltage_num(k),1);
-            [seq,sym] = viterbi(3,4,[13,15,17],0,0,result,1);
+            [~,prob] = demodulate_for_ask_qam('8QAM1',log2(voltage_num),out,sites);
+            data = prob(:);
+            [seq,sym] = viterbi(3,4,[13,15,17],0,0,data,1);
             result = seq;
             wrong_rate(7,n) = wrong_rate(7,n)+1-sum(sample == result)/sample_length;
             
             [input,sites] = modulate_for_ask_qam('8QAM2',log2(voltage_num(k)),input0,SNR(n),bias_ratio,1);
             out = channel(input,channel_mode,sigma_ns(n));
-            [result,~] = demodulate_for_ask_qam('8QAM2',log2(voltage_num),out,sites);
-            result = symbol2sequence_for_PSK(result,voltage_num(k),1);
-            [seq,sym] = viterbi(3,4,[13,15,17],1,0,result,1);
+            [~,prob] = demodulate_for_ask_qam('8QAM2',log2(voltage_num),out,sites);
+            data = prob(:);
+            [seq,sym] = viterbi(3,4,[13,15,17],1,0,data,1);
             result = seq;
             wrong_rate(8,n) = wrong_rate(8,n)+1-sum(sample == result)/sample_length;
         end
