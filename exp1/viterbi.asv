@@ -150,7 +150,7 @@ function [seq,path]=viterbi(n,N,poly,judge,ending,input,GF2n)
                     k=viterbi_extend(j,0,N);
                     val=dis(j);
                     code=viterbi_convolution(j,0,n,N,poly);
-                    val=val+viterbi_Euclid(n,input((2^n)*(i-1)+1:(2^n)*i),code,3);
+                    val=val+viterbi_Hamming(n,input(n*(i-1)+1:n*i),code);
                     if (val<new_dis(k))
                         new_dis(k)=val;
                         for t=1:L*n
@@ -165,7 +165,7 @@ function [seq,path]=viterbi(n,N,poly,judge,ending,input,GF2n)
                     k=viterbi_extend(j,1,N);
                     val=dis(j);
                     code=viterbi_convolution(j,1,n,N,poly);
-                    val=val+viterbi_Euclid(n,input((2^n)*(i-1)+1:(2^n)*i),code,3);
+                    val=val+viterbi_Hamming(n,input(n*(i-1)+1:n*i),code);
                     if (val<new_dis(k))
                     new_dis(k)=val;
                         for t=1:L*n
