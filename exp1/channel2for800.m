@@ -3,9 +3,10 @@ close all;
 clc;
 
 SNR = -20:2.5:30;
+% SNR=30;
 random_rate = 0.5;
-sample_length = 12000;
-alphabetabits = [1,2,3];
+sample_length = 1200;
+alphabetabits = [3];
 Iterates = 10;
 
 p_wrong = zeros(2*length(alphabetabits),length(SNR));
@@ -18,25 +19,19 @@ parfor n = 1:length(SNR)
         for i = 1:Iterates
             sample = random('bino',1,random_rate,1,sample_length);
             channel_mode = 2;
-            input = sample;
-            [input,symbol,p_correct_temp(k,i)] = modulate_for_ask_qam('ASK',alphabetabits(k),input,SNR(n),0,1);
+            input0 = convcode(sample,[15,17],0);
+            [input,symbol,p_correct_temp(k,i)] = modulate_for_ask_qam('ASK',alphabetabits(k),input0,SNR(n),0,1);
             out = channel(input,channel_mode,1);
             [result,~] = demodulate_for_ask_qam('ASK',alphabetabits(k),out,symbol);
             result = symbol2sequence_for_PSK(result,2^alphabetabits(k),1);
-            wrong_rate_temp(k) = wrong_rate_temp(k)+1-sum(sample == result)/sample_length;
-            
-            sample = random('bino',1,random_rate,1,sample_length);
-            channel_mode = 2;
-            input = sample;
-            [input,symbol,p_correct_temp(k+3,i)] = modulate_for_ask_qam('ASK',alphabetabits(k),input,SNR(n),0,0);
-            out = channel(input,channel_mode,1);
-            result = demodulate_for_ask_qam('ASK',alphabetabits(k),out,symbol);
-            result = symbol2sequence_for_PSK(result,alphabetabits(k),0);
-            wrong_rate_temp(k+3) = wrong_rate_temp(k+3)+1-sum(sample == result)/sample_length;
+            [real_seq,sym] = viterbi(2,4,[15,17],1,0,result,alphabetabits(k));
+            result = real_seq;
+            wrong_rate_temp(k) = wrong_rate_temp(k)+1-sum(sample == result)/sample_length;            
         end
     end
     wrong_rate(:,n) = wrong_rate_temp/Iterates;
     p_wrong(:,n) = 1-mean(p_correct_temp,2);
+    n
 end
 toc
 

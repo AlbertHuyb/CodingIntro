@@ -3,8 +3,7 @@ clear all;
 % 绘图内容
 % 硬判决和软判决
 % 映射方法有8电平bPSK，8QAM1,8QAM2
-% 1/2 效率卷积， 得到800个有效内容，富余200，
-% 对前100个重复两次，考虑到数据头中可能包含关键信息
+% 1/2 效率卷积， 得到800个有效内容
 % wrong_rate共6行，硬判决1-3，软判决4-6
 bias_ratio = 0.2; 
 len = 20;
@@ -16,63 +15,39 @@ voltage_num = [8];
 A = 3;
 S = (bias_ratio^2+1)*A^2;
 sigma_ns = sqrt(S/2./10.^(SNR/10));
-wrong_rate = zeros(3,length(sigma_ns));
+wrong_rate = zeros(6,length(sigma_ns));
 Iterates = 12;
 
 for k = 1:length(voltage_num)
 for n = 1:length(sigma_ns)
     for i = 1:Iterates
         sample = random('bino',1,random_rate,1,sample_length);
-%         硬判决        
+%       硬判决      
         channel_mode = 1;
         input = convcode(sample,[15,17],0);
         [input,sites] = modulate_for_BPSK(input,voltage_num(k),1,A,bias_ratio);
-        real_input = [repmat(input(1:100),1,2),input];
-        out = channel(real_input,channel_mode,sigma_ns(n));
+        out = channel(input,channel_mode,sigma_ns(n));
         [result,~] = judge_for_BPSK(out,voltage_num(k),bias_ratio*A,sites);
         result = symbol2sequence_for_PSK(result,voltage_num(k),1);
-        head_sequence1 = result(1:300);
-        head_sequence2 = result(301:600);
-        real_result = result(601:end);
-        temp = sum([head_sequence1;head_sequence2;real_result(1:300)]);
-        headseq = zeros(1,300);
-        headseq(temp>=2)=1;
-        headseq(temp<=1)=0;
-        [real_seq,~] = viterbi(2,4,[15,17],1,0,[headseq,real_result(301:end)],log2(voltage_num(k)));
+        [real_seq,~] = viterbi(2,4,[15,17],1,0,result,log2(voltage_num(k)));
         result = real_seq;
         wrong_rate(k,n) = wrong_rate(k,n)+1-sum(sample == result)/sample_length;
         
         if voltage_num(k)==8
             input0 = convcode(sample,[15,17],0);
             [input,sites] = modulate_for_ask_qam('8QAM1',log2(voltage_num(k)),input0,SNR(n),bias_ratio,1);
-            real_input = [repmat(input(1:100),1,2),input];
-            out = channel(real_input,channel_mode,1);
+            out = channel(input,channel_mode,1);
             [result,~] = demodulate_for_ask_qam('8QAM1',log2(voltage_num(k)),out,sites);
             result = symbol2sequence_for_PSK(result,voltage_num(k),1);
-            head_sequence1 = result(1:300);
-            head_sequence2 = result(301:600);
-            real_result = result(601:end);
-            temp = sum([head_sequence1;head_sequence2;real_result(1:300)]);
-            headseq = zeros(1,300);
-            headseq(temp>=2)=1;
-            headseq(temp<=1)=0;
-            [real_seq,~] = viterbi(2,4,[15,17],1,0,[headseq,real_result(301:end)],1);
+            [real_seq,~] = viterbi(2,4,[15,17],1,0,result,1);
             result = real_seq;
             wrong_rate(2,n) = wrong_rate(2,n)+1-sum(sample == result)/sample_length;
             
             [input,sites] = modulate_for_ask_qam('8QAM2',log2(voltage_num(k)),input0,SNR(n),bias_ratio,1);
-            real_input = [repmat(input(1:100),1,2),input];
-            out = channel(real_input,channel_mode,1);
+            out = channel(input,channel_mode,1);
             [result,~] = demodulate_for_ask_qam('8QAM2',log2(voltage_num(k)),out,sites);
             result = symbol2sequence_for_PSK(result,voltage_num(k),1);
-            head_sequence1 = result(1:300);
-            head_sequence2 = result(301:600);
-            real_result = result(601:end);
-            temp = sum([head_sequence1;head_sequence2;real_result(1:300)]);
-            headseq = zeros(1,300);
-            headseq(temp>=2)=1;
-            headseq(temp<=1)=0;
-            [real_seq,~] = viterbi(2,4,[15,17],1,0,[headseq,real_result(301:end)],1);
+            [real_seq,~] = viterbi(2,4,[15,17],1,0,result,1);
             result = real_seq;
             wrong_rate(3,n) = wrong_rate(3,n)+1-sum(sample == result)/sample_length;
         end
@@ -140,5 +115,4 @@ end
 set(gca,'yscale','log');
 legends = ['8bPSK 硬判决';'8QAM1 硬判决';'8QAM2 硬判决'];
 legend(legends,'Location','southwest')
-title('1000次使用信道 固定相位')
-
+title('800次使用信道 固定相位')
