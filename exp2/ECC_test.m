@@ -1,0 +1,16 @@
+a=1;
+b=1;
+p=10007;
+xg=1;
+yg=1477;
+n=10065;
+k=11;
+[xk,yk]=ECC_mul(a,b,p,xg,yg,k);
+plaintext=randsrc(1,1024,[0,1]);
+%ciphertext=ECC_encrypt(plaintext,a,b,p,xg,yg,n,xk,yk);
+[ciphertext_x,ciphertext_y]=ECC_encrypt(plaintext,a,b,p,xg,yg,n,xk,yk);
+plot(ciphertext_x,ciphertext_y,'*');
+plaintext(1)=1-plaintext(1);
+[ciphertext_x,ciphertext_y]=ECC_encrypt(plaintext,a,b,p,xg,yg,n,xk,yk);
+plot(ciphertext_x,ciphertext_y,'*');
+%ans=ECC_decrypt(ciphertext,a,b,p,xg,yg,n,k);

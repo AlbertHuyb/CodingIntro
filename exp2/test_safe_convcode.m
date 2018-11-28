@@ -1,5 +1,5 @@
 clear all;
-bit_length = 1000;
+bit_length = 1024;
 random_rate = 0.5;
 alpha = 0.5;
 single_band = 1500;
@@ -33,11 +33,12 @@ for i = 1:Iterations
         symbol_num = bit_length/modulate_bit;
         t = [0:dt:1/Rs*symbol_num*repeat_time*length(conv_param)-dt];
 
-        raw_data = random('bino',1,random_rate,1,bit_length);
-        conv_raw_data = convcode(raw_data,conv_param,~conv_tail_enable);
-        safe_conv_data = safe_decoder(conv_raw_data,generate_key('SCODE'));
-        safe_raw_data = viterbi(length(conv_param),conv_memory,conv_param,viterbi_hard,~conv_tail_enable,safe_conv_data,1);
-        [complex_voltages,sites] = modulate_for_PSK(conv_raw_data,2^(modulate_bit),graycode_enable,A(k),repeat_time);
+        safe_raw_data = random('bino',1,random_rate,1,bit_length);
+        conv_safe_data = convcode(raw_data,conv_param,~conv_tail_enable);
+        %safe_conv_data = safe_decoder(conv_raw_data,generate_key('SCODE'));
+        safe_data = ECC_encrypt(conv_safe_data,1,1,10007,1,1477,10065,11);
+        raw_data = viterbi(length(conv_param),conv_memory,conv_param,viterbi_hard,~conv_tail_enable,safe_data,1);
+        [complex_voltages,sites] = modulate_for_PSK(safe_data,2^(modulate_bit),graycode_enable,A(k),repeat_time);
 
         %% voltage channel
         wave = voltage2wave(complex_voltages,1/Rs,sample_rate,alpha,'sqrt',sample_time);
@@ -93,12 +94,12 @@ for i = 1:Iterations
 %         plot(real(receive_voltages),imag(receive_voltages),'o')
         [data_index,prob] = judge_for_PSK(receive_voltages,2^(modulate_bit),0,sites,repeat_time);
         receive_data = symbol2sequence_for_PSK(data_index,2^modulate_bit,graycode_enable);
-        error = (conv_raw_data~=receive_data);
+        error = (safe_data~=receive_data);
         figure
         plot(error(1:100))
         title('无信道编码')
-        receive_safe_data = safe_decoder(receive_data,generate_key('SCODE'));
-        error = (safe_conv_data~=receive_safe_data);
+        receive_safe_data = safe_decoder(safe_data,generate_key('SCODE'));
+        error = (conv_safe_data~=receive_safe_data);
         figure
         plot(error(1:100))
         title('无信道编码+安全编码')
