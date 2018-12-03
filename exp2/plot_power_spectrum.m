@@ -11,5 +11,6 @@ f_domain = fft(wave)/sample_rate;
 f_domain = abs(f_domain).^2;
 result = conv(f_domain,window);
 spectrum = result(window_size:end)/T;
+spectrum = spectrum*sample_rate;
 end
 

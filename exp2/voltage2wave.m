@@ -14,11 +14,13 @@ pulse_signal = repmat(voltages,block_length,1);
 pulse_signal = pulse_signal(:).';
 pulse_signal(mod(indexs,block_length) ~= 0)=0;
 h = rcosdesign(alpha,6,Ts/dt,type);
-[max_value,start_index] = max(h);
-coefficient = 1/max_value;
-h = h*coefficient;
+[~,start_index] = max(h);
+% coefficient = 1/max_value;
+% h = h*coefficient;
 wave = conv(pulse_signal,h);
 wave = wave(start_index-sample_time:end-start_index+1-sample_time);
+temp = conv(wave,h);
+temp = temp(start_index-1:end-start_index);
 % figure
 % plot(t,real(wave))
 % hold on
@@ -28,5 +30,6 @@ wave = wave(start_index-sample_time:end-start_index+1-sample_time);
 % title('发射基带波形实虚部')
 % xlabel('t')
 % legend(['基带波形实部';'基带波形虚部';'脉冲波形实部';'脉冲波形虚部'])
+% plot(t,[real(temp);imag(temp)]);
 end
 

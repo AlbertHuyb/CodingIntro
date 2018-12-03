@@ -22,7 +22,7 @@ if length(tail)>0
 else
     input_data = front;
 end
-Iterations = 1;
+Iterations = 5;
 for n = 0:block_num-1
     data = input_data(n*block_length+1:(n+1)*block_length);
     data_mat = reshape(data,block_size);
